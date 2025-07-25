@@ -30,6 +30,8 @@ helm repo index . --url https://<your-github-username>.github.io/<repo-name>
 ```
 Replace the URL with the GitHub Pages URL where the repo will be hosted.
 
+move tgz and index.yaml file to home directory of repository
+
 ### Commit and push
 ```
 git add all
@@ -48,11 +50,53 @@ https://<your-username>.github.io/<repo-name>/
 #### Add the Repo to Helm
 On any machine, you can now add your repo:
 ```
-helm repo add my-repo https://<your-username>.github.io/<repo-name>/
+helm repo add myrepo https://<your-username>.github.io/<repo-name>/
 helm repo update
+
+helm search repo myrepo
 ```
 
 #### Install Charts
+Retrive the values file and update accordingly. 
+
 ```
-helm install my-release my-repo/chart-one
+helm inspect values myrepo/colorapp > colorapp.yaml
+```
+We can also add ACM certificate in annotation as
+```
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: colorapp-ingress
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/healthcheck-path: /health
+    alb.ingress.kubernetes.io/group.name: frontend
+    alb.ingress.kubernetes.io/certificate-arn: <ACM ARN Endpoint>
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS": 443}]'
+spec:
+  ingressClassName: alb
+  rules:
+    - host: colorapp.example.com
+      http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: service-red
+              port:
+                number: 80
+```
+Using this values file lets install the helm chart
+```
+helm install colorapp myrepo/colorapp --namespace colorapp --values colorapp.yaml
+```
+
+#### Uninstall Chart
+```
+helm uninstall colorapp --namespace colorapp
+helm repo remove myrepo
 ```
