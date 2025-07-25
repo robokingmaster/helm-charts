@@ -62,13 +62,25 @@ Retrive the values file and update accordingly.
 ```
 helm inspect values myrepo/colorapp > colorapp.yaml
 ```
-We can also add ACM certificate in annotation as
+We can also add ACM certificate in annotation as or provide the TLS certificate
 ```
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: colorapp-ingress
+replicaCount: 1
+
+appenv:
+  appcolor: red
+
+image:
+  repository: robokingmaster/examples
+  tag: colorapp
+  pullPolicy: IfNotPresent
+
+service:
+  type: NodePort
+  port: 80
+
+ingress:
+  enabled: true
+  className: alb
   annotations:
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
@@ -76,19 +88,12 @@ metadata:
     alb.ingress.kubernetes.io/group.name: frontend
     alb.ingress.kubernetes.io/certificate-arn: <ACM ARN Endpoint>
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS": 443}]'
-spec:
-  ingressClassName: alb
-  rules:
+  hosts:
     - host: colorapp.example.com
-      http:
-        paths:
+      paths:
         - path: /
           pathType: Prefix
-          backend:
-            service:
-              name: service-red
-              port:
-                number: 80
+  tls: []
 ```
 Using this values file lets install the helm chart
 ```
