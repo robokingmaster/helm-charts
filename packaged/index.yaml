@@ -1,0 +1,14 @@
+apiVersion: v1
+entries:
+  colorapp:
+  - apiVersion: v2
+    appVersion: "1.0"
+    created: "2025-07-25T14:11:55.352785551+05:30"
+    description: A Helm chart for Kubernetes deployment of colorapp
+    digest: 5b1b8bed220b92ef1951d8e11941184648b1662237998e1aa6bcf9ee6804db19
+    name: colorapp
+    type: application
+    urls:
+    - https://robokingmaster.github.io/helm-charts/packaged/colorapp-0.1.0.tgz
+    version: 0.1.0
+generated: "2025-07-25T14:11:55.352213458+05:30"
